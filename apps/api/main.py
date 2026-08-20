@@ -186,6 +186,36 @@ async def get_report(report_id: str):
     raise HTTPException(status_code=404, detail="Research report not found")
 
 
+@app.get("/api/research/{report_id}/export/markdown")
+async def export_markdown(report_id: str):
+    report = await get_report(report_id)
+    from researchos.packages.research.exporter import report_exporter
+    from fastapi.responses import PlainTextResponse
+    filepath = report_exporter.export_to_markdown(report)
+    content = Path(filepath).read_text(encoding="utf-8")
+    return PlainTextResponse(content, media_type="text/markdown", headers={"Content-Disposition": f"attachment; filename=Report_{report_id}.md"})
+
+
+@app.get("/api/research/{report_id}/export/json")
+async def export_json(report_id: str):
+    report = await get_report(report_id)
+    from researchos.packages.research.exporter import report_exporter
+    from fastapi.responses import PlainTextResponse
+    filepath = report_exporter.export_to_json(report)
+    content = Path(filepath).read_text(encoding="utf-8")
+    return PlainTextResponse(content, media_type="application/json", headers={"Content-Disposition": f"attachment; filename=Report_{report_id}.json"})
+
+
+@app.get("/api/research/{report_id}/export/csv")
+async def export_csv(report_id: str):
+    report = await get_report(report_id)
+    from researchos.packages.research.exporter import report_exporter
+    from fastapi.responses import PlainTextResponse
+    filepath = report_exporter.export_to_csv(report)
+    content = Path(filepath).read_text(encoding="utf-8")
+    return PlainTextResponse(content, media_type="text/csv", headers={"Content-Disposition": f"attachment; filename=Deals_{report_id}.csv"})
+
+
 @app.get("/api/models", response_model=List[ModelSpec])
 async def list_models(free_only: bool = True):
     return model_catalog.get_models(free_only=free_only)
