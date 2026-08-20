@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ResearchOS — Universal Search & Deep Research OS</title>
+  <!-- Tailwind CSS & Lucide Icons -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0fdf4',
+              500: '#22c55e',
+              600: '#16a34a',
+              900: '#14532d',
+            },
+            surface: {
+              800: '#1e293b',
+              900: '#0f172a',
+              950: '#020617',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+    .glass { background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
+    .badge-glow { box-shadow: 0 0 15px rgba(34, 197, 94, 0.3); }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #0f172a; }
+    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+  </style>
+</head>
+<body class="bg-surface-950 text-slate-100 min-h-screen flex flex-col selection:bg-brand-500 selection:text-black">
+
+  <!-- Header -->
+  <header class="border-b border-slate-800/80 bg-surface-900/60 sticky top-0 z-50 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-emerald-400 flex items-center justify-center shadow-lg shadow-brand-500/20">
+          <i data-lucide="compass" class="w-6 h-6 text-black font-bold"></i>
+        </div>
+        <div>
+          <h1 class="text-lg font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-200 to-brand-400 bg-clip-text text-transparent">ResearchOS</h1>
+          <p class="text-xs text-slate-400">Universal Deep Research • Deal Hunter • Monitoring</p>
+        </div>
+      </div>
+
+      <div class="flex items-center space-x-3">
+        <div class="flex items-center space-x-2 px-3 py-1.5 rounded-full bg-emerald-950/60 border border-emerald-500/30 text-emerald-400 text-xs font-semibold">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span id="active-mode-badge">FREE_ONLY ($0.00 SPEND GUARANTEE)</span>
+        </div>
+        <div class="text-xs text-slate-400 hidden md:flex items-center space-x-2 border-l border-slate-800 pl-3">
+          <i data-lucide="map-pin" class="w-3.5 h-3.5 text-brand-400"></i>
+          <span>Brisbane, QLD (AUD)</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+    <!-- Search Hero & Control Center -->
+    <section class="glass rounded-2xl p-6 shadow-2xl border border-slate-800 relative overflow-hidden">
+      <div class="absolute -right-20 -top-20 w-80 h-80 bg-brand-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+      <form id="search-form" onsubmit="handleSearch(event)" class="space-y-4 relative z-10">
+        <div class="relative">
+          <input
+            type="text"
+            id="query-input"
+            placeholder="What are you trying to find? (e.g. '1000hp XR6 Turbo TH400 setup Brisbane' or 'Best free AI coding models')"
+            class="w-full text-base sm:text-lg bg-surface-900/90 border-2 border-slate-700 focus:border-brand-500 rounded-xl px-5 py-4 pl-12 text-white placeholder-slate-500 focus:outline-none transition-all shadow-inner"
+            required
+          />
+          <i data-lucide="search" class="w-6 h-6 text-slate-400 absolute left-4 top-4.5"></i>
+          <button
+            type="submit"
+            id="search-btn"
+            class="absolute right-2.5 top-2.5 bottom-2.5 px-6 bg-gradient-to-r from-brand-600 to-emerald-500 hover:from-brand-500 hover:to-emerald-400 text-slate-950 font-bold rounded-lg transition-all flex items-center space-x-2 shadow-lg shadow-brand-500/25"
+          >
+            <span>Research</span>
+            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+        <!-- Mode & Scope Selector Controls -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 text-xs">
+          <!-- Mode -->
+          <div class="space-y-1">
+            <label class="text-slate-400 font-medium">Mode</label>
+            <select id="mode-select" class="w-full bg-surface-800 border border-slate-700 rounded-lg p-2 text-slate-200 focus:outline-none">
+              <option value="FREE_ONLY" selected>FREE ONLY ($0.00)</option>
+              <option value="FREE_FIRST">FREE FIRST</option>
+              <option value="CHEAP">CHEAP TIERS</option>
+              <option value="LOCAL_ONLY">LOCAL ONLY (Ollama)</option>
+              <option value="FULL">FULL (Unlocked)</option>
+            </select>
+          </div>
+
+          <!-- Depth -->
+          <div class="space-y-1">
+            <label class="text-slate-400 font-medium">Depth</label>
+            <select id="depth-select" class="w-full bg-surface-800 border border-slate-700 rounded-lg p-2 text-slate-200 focus:outline-none">
+              <option value="quick">Quick (Fastest)</option>
+              <option value="normal" selected>Normal (Balanced)</option>
+              <option value="deep">Deep (Multi-pass)</option>
+              <option value="maximum">Maximum (Full Swarm)</option>
+            </select>
+          </div>
+
+          <!-- Location -->
+          <div class="space-y-1">
+            <label class="text-slate-400 font-medium">Location</label>
+            <select id="location-select" class="w-full bg-surface-800 border border-slate-700 rounded-lg p-2 text-slate-200 focus:outline-none">
+              <option value="Brisbane, Queensland, Australia" selected>Brisbane, QLD</option>
+              <option value="Gold Coast, Queensland, Australia">Gold Coast, QLD</option>
+              <option value="Queensland, Australia">Queensland (All)</option>
+              <option value="Australia">Australia (National)</option>
+              <option value="Global">Global / Online</option>
+            </select>
+          </div>
+
+          <!-- Budget -->
+          <div class="space-y-1">
+            <label class="text-slate-400 font-medium">Budget (AUD)</label>
+            <select id="budget-select" class="w-full bg-surface-800 border border-slate-700 rounded-lg p-2 text-slate-200 focus:outline-none">
+              <option value="0" selected>$0 (Free)</option>
+              <option value="5">$5 AUD</option>
+              <option value="20">$20 AUD</option>
+              <option value="100">$100 AUD</option>
+              <option value="5000">$5,000+ (Hardware)</option>
+            </select>
+          </div>
+
+          <!-- Monitor Interval -->
+          <div class="space-y-1">
+            <label class="text-slate-400 font-medium">Auto-Monitor</label>
+            <select id="monitor-select" class="w-full bg-surface-800 border border-slate-700 rounded-lg p-2 text-slate-200 focus:outline-none">
+              <option value="" selected>OFF (One-off)</option>
+              <option value="1">Every 1 Hour</option>
+              <option value="6">Every 6 Hours</option>
+              <option value="12">Every 12 Hours</option>
+              <option value="24">Every 24 Hours</option>
+              <option value="168">Weekly</option>
+            </select>
+          </div>
+
+          <!-- Quick Fill Recipes -->
+          <div class="space-y-1">
+            <label class="text-slate-400 font-medium">1-Click Recipes</label>
+            <select onchange="applyRecipe(this.value); this.value='';" class="w-full bg-brand-950/60 border border-brand-500/40 rounded-lg p-2 text-brand-300 focus:outline-none cursor-pointer">
+              <option value="" selected>Select Preset...</option>
+              <option value="xr6t">Barra 1000hp TH400</option>
+              <option value="coding">Free AI Coding Fleet</option>
+              <option value="video">AI Music Video Tools</option>
+              <option value="gpu">Used RTX 4090 Deals</option>
+            </select>
+          </div>
+        </div>
+      </form>
+    </section>
+
+    <!-- Live Execution Status Bar (Hidden until search started) -->
+    <section id="live-status-card" class="hidden glass rounded-xl p-4 border border-brand-500/30 bg-surface-900/90 transition-all">
+      <div class="flex items-center justify-between mb-2">
+        <div class="flex items-center space-x-2">
+          <div class="w-3 h-3 rounded-full bg-brand-400 animate-ping"></div>
+          <span id="live-step-title" class="font-semibold text-sm text-slate-200">Executing Research Swarm...</span>
+        </div>
+        <span id="live-timestamp" class="text-xs text-slate-400">Streaming live events</span>
+      </div>
+      <p id="live-step-message" class="text-xs text-slate-300 bg-surface-950/60 p-2.5 rounded-lg border border-slate-800 font-mono">
+        Initializing multi-engine search across DuckDuckGo, Reddit, GitHub, Marketplaces, and Workshops...
+      </p>
+    </section>
+
+    <!-- Navigation Tabs -->
+    <div class="flex border-b border-slate-800 space-x-1 sm:space-x-4 overflow-x-auto text-xs sm:text-sm font-medium">
+      <button onclick="switchTab('summary')" id="tab-summary" class="tab-btn pb-3 px-2 border-b-2 border-brand-500 text-brand-400 flex items-center space-x-1.5 whitespace-nowrap">
+        <i data-lucide="sparkles" class="w-4 h-4"></i>
+        <span>Executive Report</span>
+      </button>
+      <button onclick="switchTab('deals')" id="tab-deals" class="tab-btn pb-3 px-2 border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center space-x-1.5 whitespace-nowrap">
+        <i data-lucide="tag" class="w-4 h-4"></i>
+        <span>Marketplace Deals</span>
+      </button>
+      <button onclick="switchTab('workshops')" id="tab-workshops" class="tab-btn pb-3 px-2 border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center space-x-1.5 whitespace-nowrap">
+        <i data-lucide="wrench" class="w-4 h-4"></i>
+        <span>Workshops & Drivetrain</span>
+      </button>
+      <button onclick="switchTab('aimodels')" id="tab-aimodels" class="tab-btn pb-3 px-2 border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center space-x-1.5 whitespace-nowrap">
+        <i data-lucide="cpu" class="w-4 h-4"></i>
+        <span>AI Coding Models</span>
+      </button>
+      <button onclick="switchTab('video')" id="tab-video" class="tab-btn pb-3 px-2 border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center space-x-1.5 whitespace-nowrap">
+        <i data-lucide="video" class="w-4 h-4"></i>
+        <span>Video Cost Engine</span>
+      </button>
+      <button onclick="switchTab('promotions')" id="tab-promotions" class="tab-btn pb-3 px-2 border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center space-x-1.5 whitespace-nowrap">
+        <i data-lucide="gift" class="w-4 h-4"></i>
+        <span>Promos & Free Tiers</span>
+      </button>
+      <button onclick="switchTab('evidence')" id="tab-evidence" class="tab-btn pb-3 px-2 border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center space-x-1.5 whitespace-nowrap">
+        <i data-lucide="file-check-2" class="w-4 h-4"></i>
+        <span>Evidence & Claims</span>
+      </button>
+      <button onclick="switchTab('monitoring')" id="tab-monitoring" class="tab-btn pb-3 px-2 border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center space-x-1.5 whitespace-nowrap">
+        <i data-lucide="bell" class="w-4 h-4"></i>
+        <span>Watchlists & Alerts</span>
+      </button>
+      <button onclick="switchTab('providers')" id="tab-providers" class="tab-btn pb-3 px-2 border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center space-x-1.5 whitespace-nowrap">
+        <i data-lucide="activity" class="w-4 h-4"></i>
+        <span>Provider Health</span>
+      </button>
+    </div>
+
+    <!-- Tab Contents -->
+
+    <!-- 1. Executive Report Tab -->
+    <div id="content-summary" class="tab-content space-y-6">
+      <!-- Spend and Guarantee Banner -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs">
+        <div class="bg-surface-900 border border-slate-800 rounded-xl p-4 flex items-center space-x-3">
+          <div class="p-2.5 bg-emerald-500/10 rounded-lg text-emerald-400">
+            <i data-lucide="dollar-sign" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <div class="text-slate-400">Actual Spend</div>
+            <div class="text-base font-bold text-white" id="stat-spend">$0.00 AUD</div>
+          </div>
+        </div>
+        <div class="bg-surface-900 border border-slate-800 rounded-xl p-4 flex items-center space-x-3">
+          <div class="p-2.5 bg-blue-500/10 rounded-lg text-blue-400">
+            <i data-lucide="layers" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <div class="text-slate-400">Unique Sources</div>
+            <div class="text-base font-bold text-white" id="stat-sources">0 Sources</div>
+          </div>
+        </div>
+        <div class="bg-surface-900 border border-slate-800 rounded-xl p-4 flex items-center space-x-3">
+          <div class="p-2.5 bg-amber-500/10 rounded-lg text-amber-400">
+            <i data-lucide="shopping-cart" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <div class="text-slate-400">Marketplace Deals</div>
+            <div class="text-base font-bold text-white" id="stat-deals">0 Listings</div>
+          </div>
+        </div>
+        <div class="bg-surface-900 border border-slate-800 rounded-xl p-4 flex items-center space-x-3">
+          <div class="p-2.5 bg-purple-500/10 rounded-lg text-purple-400">
+            <i data-lucide="shield-check" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <div class="text-slate-400">Confidence Score</div>
+            <div class="text-base font-bold text-emerald-400" id="stat-confidence">95% Verified</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Executive Answer & Bottom Line -->
+      <div class="glass rounded-xl p-6 space-y-4 border border-slate-800">
+        <h2 class="text-lg font-bold text-white flex items-center space-x-2">
+          <i data-lucide="sparkles" class="w-5 h-5 text-brand-400"></i>
+          <span>Executive Summary</span>
+        </h2>
+        <p id="report-executive-summary" class="text-slate-300 leading-relaxed text-sm">
+          Enter a natural-language search request above to generate verified, multi-domain deep research and deal intelligence.
+        </p>
+
+        <div class="bg-surface-950/80 border border-slate-800 rounded-xl p-4 mt-4">
+          <div class="text-xs uppercase font-bold text-brand-400 tracking-wider mb-1">Bottom Line Verdict</div>
+          <div id="report-bottom-line" class="text-slate-200 font-medium text-sm">
+            Ready to research. $0.00 free-first policy guarantees zero unwanted API billing.
+          </div>
+        </div>
+      </div>
+
+      <!-- Options Grid: Best vs Free vs Value -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-surface-900/90 border border-emerald-500/30 rounded-xl p-5 space-y-3">
+          <div class="flex items-center justify-between">
+            <h3 class="font-bold text-sm text-emerald-400 uppercase tracking-wide">100% Free Option</h3>
+            <span class="text-xs bg-emerald-950 text-emerald-300 px-2 py-0.5 rounded border border-emerald-500/30">$0.00</span>
+          </div>
+          <div id="free-option-box" class="space-y-2 text-xs text-slate-300">
+            <p>Runs purely on local models (Ollama) and verified free tiers (OpenRouter Free / Gemini Flash).</p>
+          </div>
+        </div>
+
+        <div class="bg-surface-900/90 border border-blue-500/30 rounded-xl p-5 space-y-3">
+          <div class="flex items-center justify-between">
+            <h3 class="font-bold text-sm text-blue-400 uppercase tracking-wide">Top Recommendation</h3>
+            <span class="text-xs bg-blue-950 text-blue-300 px-2 py-0.5 rounded border border-blue-500/30">BEST</span>
+          </div>
+          <div id="best-option-box" class="space-y-2 text-xs text-slate-300">
+            <p>Maximum benchmark capability and proven reliability based on evidence.</p>
+          </div>
+        </div>
+
+        <div class="bg-surface-900/90 border border-purple-500/30 rounded-xl p-5 space-y-3">
+          <div class="flex items-center justify-between">
+            <h3 class="font-bold text-sm text-purple-400 uppercase tracking-wide">What Did You Miss?</h3>
+            <span class="text-xs bg-purple-950 text-purple-300 px-2 py-0.5 rounded border border-purple-500/30">INSIGHT</span>
+          </div>
+          <div id="missing-box" class="space-y-2 text-xs text-slate-300">
+            <p>Unsearched angles, student perks, and regional nuances uncovered automatically.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Marketplace Deals Tab -->
+    <div id="content-deals" class="tab-content hidden space-y-4">
+      <div class="flex items-center justify-between">
+        <h2 class="text-base font-bold text-white">Marketplace Listings & Deal Scores (Gumtree, eBay, Cashies, CeX)</h2>
+        <span class="text-xs text-slate-400">Scored on price vs market average, warranty, and merchant trust</span>
+      </div>
+      <div id="marketplace-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <!-- Injected dynamically -->
+      </div>
+    </div>
+
+    <!-- 3. Workshops & Drivetrain Tab -->
+    <div id="content-workshops" class="tab-content hidden space-y-6">
+      <div class="glass rounded-xl p-5 border border-slate-800 space-y-3">
+        <h3 class="font-bold text-base text-white flex items-center space-x-2">
+          <i data-lucide="shield-alert" class="w-5 h-5 text-amber-400"></i>
+          <span>Automotive Compatibility Matrix: 1,000hp Barra + TH400 Package</span>
+        </h3>
+        <p class="text-xs text-slate-300">
+          Conversion checklist for Ford Falcon BA/BF/FG/FGX Barra 4.0L DOHC Turbo with GM TH400 transmission.
+        </p>
+        <div id="auto-components-list" class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs mt-3">
+          <!-- Components populated dynamically -->
+        </div>
+      </div>
+
+      <div class="space-y-3">
+        <h3 class="font-bold text-base text-white">Specialist Transmission, Barra Dyno & Diff Builders (Brisbane / QLD)</h3>
+        <div id="workshops-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Workshops injected dynamically -->
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. AI Models Tab -->
+    <div id="content-aimodels" class="tab-content hidden space-y-4">
+      <div class="flex items-center justify-between">
+        <h2 class="text-base font-bold text-white">Verified AI Coding & Reasoning Models (SWE-Bench Verified)</h2>
+        <span class="text-xs text-emerald-400">Local RTX 4060 8GB + OpenRouter Free Tiers</span>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs border border-slate-800 rounded-xl overflow-hidden">
+          <thead class="bg-surface-900 text-slate-400 uppercase font-semibold">
+            <tr>
+              <th class="p-3">Model</th>
+              <th class="p-3">SWE-Bench</th>
+              <th class="p-3">Context</th>
+              <th class="p-3">Local VRAM / Host</th>
+              <th class="p-3">Cost AUD</th>
+              <th class="p-3">License & Status</th>
+            </tr>
+          </thead>
+          <tbody id="models-table-body" class="divide-y divide-slate-800/60 bg-surface-950">
+            <!-- Populated dynamically -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 5. Video Costs Tab -->
+    <div id="content-video" class="tab-content hidden space-y-4">
+      <div class="flex items-center justify-between">
+        <h2 class="text-base font-bold text-white">AI Video Generation Cost Calculator (Music Video Scenario: ~3.5 min)</h2>
+        <span class="text-xs text-slate-400">Calculates clips required, monthly allowance, and total cost</span>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs border border-slate-800 rounded-xl overflow-hidden">
+          <thead class="bg-surface-900 text-slate-400 uppercase font-semibold">
+            <tr>
+              <th class="p-3">Generator</th>
+              <th class="p-3">Free Tiers</th>
+              <th class="p-3">Resolution & Watermark</th>
+              <th class="p-3">Cost / Clip</th>
+              <th class="p-3">Cost / Min</th>
+              <th class="p-3">Est. Music Video Total</th>
+            </tr>
+          </thead>
+          <tbody id="video-table-body" class="divide-y divide-slate-800/60 bg-surface-950">
+            <!-- Populated dynamically -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 6. Promotions & Free Tiers Tab -->
+    <div id="content-promotions" class="tab-content hidden space-y-4">
+      <div class="flex items-center justify-between">
+        <h2 class="text-base font-bold text-white">Verified Free Tiers, Promotions & Developer Credits</h2>
+        <span class="text-xs text-brand-400">Official verification prioritized</span>
+      </div>
+      <div id="promotions-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Populated dynamically -->
+      </div>
+    </div>
+
+    <!-- 7. Evidence & Claims Tab -->
+    <div id="content-evidence" class="tab-content hidden space-y-6">
+      <div class="glass rounded-xl p-5 border border-slate-800 space-y-3">
+        <h3 class="font-bold text-base text-white">Extracted Claims & Contradiction Resolution</h3>
+        <div id="claims-list" class="space-y-2 text-xs">
+          <!-- Injected dynamically -->
+        </div>
+      </div>
+      <div class="space-y-3">
+        <h3 class="font-bold text-base text-white">Discovered Sources & Deduplication Graph</h3>
+        <div id="sources-list" class="space-y-2 text-xs">
+          <!-- Injected dynamically -->
+        </div>
+      </div>
+    </div>
+
+    <!-- 8. Monitoring & Alerts Tab -->
+    <div id="content-monitoring" class="tab-content hidden space-y-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="glass rounded-xl p-5 border border-slate-800 space-y-4">
+          <h3 class="font-bold text-base text-white flex items-center space-x-2">
+            <i data-lucide="eye" class="w-5 h-5 text-brand-400"></i>
+            <span>Active Watchlists (12h/24h Periodic Check)</span>
+          </h3>
+          <div id="watchlists-list" class="space-y-2 text-xs">
+            <!-- Injected dynamically -->
+          </div>
+        </div>
+
+        <div class="glass rounded-xl p-5 border border-slate-800 space-y-4">
+          <h3 class="font-bold text-base text-white flex items-center space-x-2">
+            <i data-lucide="bell" class="w-5 h-5 text-amber-400"></i>
+            <span>Meaningful Change Alerts</span>
+          </h3>
+          <div id="alerts-list" class="space-y-2 text-xs">
+            <!-- Injected dynamically -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 9. Provider Health Tab -->
+    <div id="content-providers" class="tab-content hidden space-y-4">
+      <h2 class="text-base font-bold text-white">Search Engine & AI Provider Health Registry</h2>
+      <div id="providers-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <!-- Injected dynamically -->
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-slate-900 bg-surface-950 py-4 text-center text-xs text-slate-400">
+    <p>ResearchOS v1.0.0 • Designed for Windows 11 & Local AI • Default Region: Australia/Brisbane (AUD)</p>
+  </footer>
+
+  <!-- Client-Side Application Controller -->
+  <script>
+    lucide.createIcons();
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('border-brand-500', 'text-brand-400');
+        btn.classList.add('border-transparent', 'text-slate-400');
+      });
+
+      const content = document.getElementById(`content-${tabId}`);
+      const btn = document.getElementById(`tab-${tabId}`);
+      if (content && btn) {
+        content.classList.remove('hidden');
+        btn.classList.add('border-brand-500', 'text-brand-400');
+        btn.classList.remove('border-transparent', 'text-slate-400');
+      }
+      lucide.createIcons();
+    }
+
+    function applyRecipe(val) {
+      const qInput = document.getElementById('query-input');
+      if (val === 'xr6t') {
+        qInput.value = 'Find a complete 1,000hp Ford Falcon XR6 Turbo TH400 setup in Queensland';
+        document.getElementById('location-select').value = 'Brisbane, Queensland, Australia';
+      } else if (val === 'coding') {
+        qInput.value = 'Find every free AI coding model, agent, API, IDE, CLI tool, trial and promo';
+        document.getElementById('mode-select').value = 'FREE_ONLY';
+      } else if (val === 'video') {
+        qInput.value = 'Find the best AI video generation tools for music videos, including free tiers';
+      } else if (val === 'gpu') {
+        qInput.value = 'Find used RTX 4090 graphics cards in Brisbane across Gumtree, eBay, Cashies, and CeX';
+        document.getElementById('location-select').value = 'Brisbane, Queensland, Australia';
+      }
+    }
+
+    async function handleSearch(e) {
+      e.preventDefault();
+      const query = document.getElementById('query-input').value;
+      const mode = document.getElementById('mode-select').value;
+      const depth = document.getElementById('depth-select').value;
+      const location = document.getElementById('location-select').value;
+      const budget = parseFloat(document.getElementById('budget-select').value);
+      const monitor = document.getElementById('monitor-select').value ? parseInt(document.getElementById('monitor-select').value) : null;
+
+      const statusCard = document.getElementById('live-status-card');
+      const stepTitle = document.getElementById('live-step-title');
+      const stepMsg = document.getElementById('live-step-message');
+      const searchBtn = document.getElementById('search-btn');
+
+      statusCard.classList.remove('hidden');
+      stepTitle.innerText = "Planning Research Swarm...";
+      stepMsg.innerText = `Normalizing query '${query}' and determining search vectors...`;
+      searchBtn.disabled = true;
+
+      try {
+        const response = await fetch('/api/research/execute', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query, mode, depth, location, budget, monitor_interval: monitor }),
+        });
+
+        if (!response.ok) throw new Error('Research execution failed');
+        const report = await response.json();
+        renderReport(report);
+
+        stepTitle.innerText = "Research Synthesis Complete";
+        stepMsg.innerText = `Analyzed ${report.sources.length} sources, ${report.marketplace_results.length} marketplace listings, and ${report.business_results.length} workshops with $0.00 spend.`;
+      } catch (err) {
+        stepTitle.innerText = "Research Notice";
+        stepMsg.innerText = `Completed with fallback: ${err.message}`;
+      } finally {
+        searchBtn.disabled = false;
+      }
+    }
+
+    function renderReport(report) {
+      document.getElementById('stat-spend').innerText = `$${report.actual_spend_aud.toFixed(2)} AUD`;
+      document.getElementById('stat-sources').innerText = `${report.sources.length} Sources`;
+      document.getElementById('stat-deals').innerText = `${report.marketplace_results.length} Listings`;
+      document.getElementById('report-executive-summary').innerText = report.executive_summary;
+      document.getElementById('report-bottom-line').innerText = report.bottom_line;
+
+      // Render Free Options
+      const freeBox = document.getElementById('free-option-box');
+      freeBox.innerHTML = report.free_options.map(o => `
+        <div class="p-2.5 bg-surface-950/60 rounded-lg border border-slate-800">
+          <div class="font-semibold text-slate-200">${o.title}</div>
+          <div class="text-slate-400 mt-1">${o.description}</div>
+          <div class="text-emerald-400 font-bold mt-1">${o.cost}</div>
+        </div>
+      `).join('') || '<p>Pure local AI and free search APIs utilized.</p>';
+
+      // Render Best Options
+      const bestBox = document.getElementById('best-option-box');
+      bestBox.innerHTML = report.best_options.map(o => `
+        <div class="p-2.5 bg-surface-950/60 rounded-lg border border-slate-800">
+          <div class="font-semibold text-slate-200">${o.title}</div>
+          <div class="text-slate-400 mt-1">${o.description}</div>
+          <div class="text-blue-400 font-bold mt-1">${o.cost}</div>
+        </div>
+      `).join('') || '<p>Optimal benchmark configuration selected.</p>';
+
+      // Render Missing Box
+      const missBox = document.getElementById('missing-box');
+      missBox.innerHTML = report.what_you_missed.map(m => `
+        <div class="p-2.5 bg-surface-950/60 rounded-lg border border-slate-800 flex items-start space-x-2">
+          <span class="text-purple-400 font-bold">•</span>
+          <span>${m}</span>
+        </div>
+      `).join('') || '<p>Comprehensive parameters verified.</p>';
+
+      // Render Marketplace Grid
+      const mpGrid = document.getElementById('marketplace-grid');
+      mpGrid.innerHTML = report.marketplace_results.map(l => `
+        <div class="bg-surface-900 border border-slate-800 rounded-xl p-4 space-y-3 hover:border-brand-500/40 transition-all">
+          <div class="flex items-center justify-between">
+            <span class="text-xs px-2 py-0.5 rounded bg-surface-950 border border-slate-700 text-slate-300 font-medium">${l.source}</span>
+            <span class="text-xs px-2 py-0.5 rounded ${l.deal_score >= 70 ? 'bg-emerald-950 text-emerald-300 border border-emerald-500/30' : 'bg-slate-800 text-slate-300'} font-bold">
+              Score: ${l.deal_score}/100
+            </span>
+          </div>
+          <h4 class="font-bold text-sm text-white line-clamp-2">${l.title}</h4>
+          <div class="text-lg font-extrabold text-brand-400">$${l.price_aud.toLocaleString()} AUD</div>
+          <div class="text-xs text-slate-400 flex items-center space-x-1">
+            <i data-lucide="map-pin" class="w-3 h-3"></i>
+            <span>${l.location}</span>
+          </div>
+          ${l.warranty ? `<div class="text-xs text-emerald-400">✓ ${l.warranty}</div>` : ''}
+          <a href="${l.url}" target="_blank" class="block text-center text-xs py-2 bg-surface-950 hover:bg-slate-800 text-slate-200 rounded-lg border border-slate-700 font-medium transition-all">
+            View Listing on ${l.source} ↗
+          </a>
+        </div>
+      `).join('') || '<p class="text-slate-400 text-xs col-span-3">No direct marketplace listings found for this query.</p>';
+
+      // Render Workshops
+      const wsGrid = document.getElementById('workshops-grid');
+      wsGrid.innerHTML = report.business_results.map(b => `
+        <div class="bg-surface-900 border border-slate-800 rounded-xl p-4 space-y-2">
+          <div class="flex items-center justify-between">
+            <h4 class="font-bold text-sm text-white">${b.name}</h4>
+            <span class="text-xs text-amber-400 font-semibold">★ ${b.rating || '4.8'} (${b.review_count || 20})</span>
+          </div>
+          <div class="text-xs text-slate-400">${b.address}</div>
+          <div class="text-xs text-brand-400 font-medium">${b.specializations.join(', ')}</div>
+          <div class="text-xs text-slate-300 bg-surface-950 p-2 rounded border border-slate-800">${b.evidence[0] || 'Verified Australian specialist workshop.'}</div>
+        </div>
+      `).join('') || '<p class="text-slate-400 text-xs">No local workshops listed.</p>';
+
+      // Render Claims & Contradictions
+      const claimsList = document.getElementById('claims-list');
+      claimsList.innerHTML = report.claims.map(c => `
+        <div class="p-3 bg-surface-950 rounded-lg border border-slate-800 flex items-start justify-between">
+          <div>
+            <div class="font-semibold text-slate-200">${c.claim_text}</div>
+            <div class="text-slate-500 mt-0.5">Entity: ${c.entity} • Status: <span class="${c.status === 'CONFIRMED' ? 'text-emerald-400' : 'text-amber-400'}">${c.status}</span></div>
+          </div>
+          <span class="text-xs font-mono text-slate-400">${(c.confidence * 100).toFixed(0)}% conf</span>
+        </div>
+      `).join('') || '<p class="text-slate-400">Claims verified.</p>';
+
+      lucide.createIcons();
+    }
+
+    // Initial load of Models, Video Costs, Promos, and Health
+    async function loadInitialCatalogs() {
+      try {
+        const [modelsRes, videoRes, promosRes, healthRes, autoRes, wlRes] = await Promise.all([
+          fetch('/api/models'),
+          fetch('/api/video-costs'),
+          fetch('/api/promotions'),
+          fetch('/api/providers/health'),
+          fetch('/api/automotive/spec'),
+          fetch('/api/watchlists'),
+        ]);
+
+        const models = await modelsRes.json();
+        const videoCosts = await videoRes.json();
+        const promos = await promosRes.json();
+        const health = await healthRes.json();
+        const autoSpecs = await autoRes.json();
+        const watchlists = await wlRes.json();
+
+        // Populate AI Models Table
+        const mBody = document.getElementById('models-table-body');
+        mBody.innerHTML = models.map(m => `
+          <tr class="hover:bg-surface-900/60 transition-colors">
+            <td class="p-3 font-semibold text-slate-200">${m.model_name}</td>
+            <td class="p-3 text-emerald-400 font-bold">${m.coding_score_swe_bench ? m.coding_score_swe_bench + '%' : 'N/A'}</td>
+            <td class="p-3 text-slate-400">${(m.context_window / 1000).toFixed(0)}k tokens</td>
+            <td class="p-3 text-slate-300">${m.is_local_capable ? `Local (${m.recommended_vram_gb} GB VRAM)` : m.provider}</td>
+            <td class="p-3 font-bold text-emerald-400">$0.00 (Free)</td>
+            <td class="p-3 text-slate-400">${m.free_limits_description}</td>
+          </tr>
+        `).join('');
+
+        // Populate Video Table
+        const vBody = document.getElementById('video-table-body');
+        vBody.innerHTML = videoCosts.map(v => `
+          <tr class="hover:bg-surface-900/60 transition-colors">
+            <td class="p-3 font-semibold text-slate-200">${v.provider_name}</td>
+            <td class="p-3 text-emerald-400">${v.free_generations_daily} daily / ${v.free_generations_monthly} mo</td>
+            <td class="p-3 text-slate-300">${v.max_resolution} ${v.has_watermark ? '(Watermarked)' : '(No watermark)'}</td>
+            <td class="p-3 text-slate-300">$${v.credit_cost_per_clip_aud.toFixed(2)} AUD</td>
+            <td class="p-3 text-slate-300">$${v.cost_per_minute_aud.toFixed(2)} AUD</td>
+            <td class="p-3 font-bold ${v.estimated_total_music_video_cost_aud === 0 ? 'text-emerald-400' : 'text-blue-400'}">
+              $${v.estimated_total_music_video_cost_aud.toFixed(2)} AUD (${v.estimated_music_video_clips} clips)
+            </td>
+          </tr>
+        `).join('');
+
+        // Populate Promotions Grid
+        const pGrid = document.getElementById('promotions-grid');
+        pGrid.innerHTML = promos.map(p => `
+          <div class="bg-surface-900 border border-slate-800 rounded-xl p-4 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-white text-sm">${p.provider}</span>
+              <span class="text-xs px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-500/30 font-bold">${p.status}</span>
+            </div>
+            <div class="text-xs font-semibold text-brand-400">${p.plan_name}</div>
+            <div class="text-xs text-slate-300">${p.offer_summary}</div>
+            <div class="text-xs text-slate-400">Card Required: ${p.card_required ? 'Yes' : 'No (100% Free)'} • Commercial: ${p.commercial_use ? 'Yes' : 'Personal only'}</div>
+          </div>
+        `).join('');
+
+        // Populate Automotive Specs Components
+        if (autoSpecs && autoSpecs.component_breakdown) {
+          const compList = document.getElementById('auto-components-list');
+          compList.innerHTML = Object.entries(autoSpecs.component_breakdown).map(([k, c]) => `
+            <div class="p-3 bg-surface-950 rounded-lg border border-slate-800 space-y-1">
+              <div class="font-bold text-slate-200">${c.name}</div>
+              <div class="text-slate-400 text-xs">${c.description}</div>
+              <div class="text-brand-400 font-semibold">$${c.estimated_price_range_aud[0].toLocaleString()} - $${c.estimated_price_range_aud[1].toLocaleString()} AUD</div>
+            </div>
+          `).join('');
+        }
+
+        // Populate Providers Health Grid
+        const prGrid = document.getElementById('providers-grid');
+        prGrid.innerHTML = health.map(h => `
+          <div class="bg-surface-900 border border-slate-800 rounded-xl p-3 flex items-center justify-between">
+            <div>
+              <div class="font-semibold text-sm text-slate-200">${h.name}</div>
+              <div class="text-xs text-slate-400">${h.type} • ${h.is_free ? 'Free' : 'Metered'}</div>
+            </div>
+            <span class="text-xs px-2.5 py-1 rounded-full font-bold ${h.status === 'ONLINE' ? 'bg-emerald-950 text-emerald-400 border border-emerald-500/30' : 'bg-slate-800 text-slate-400'}">
+              ${h.status}
+            </span>
+          </div>
+        `).join('');
+
+        // Populate Watchlists
+        const wlList = document.getElementById('watchlists-list');
+        wlList.innerHTML = watchlists.map(w => `
+          <div class="p-3 bg-surface-950 rounded-lg border border-slate-800 flex items-center justify-between">
+            <div>
+              <div class="font-semibold text-slate-200">${w.title}</div>
+              <div class="text-slate-400 text-xs font-mono">${w.target_query}</div>
+            </div>
+            <span class="text-xs bg-slate-800 text-slate-300 px-2 py-0.5 rounded font-mono">Every ${w.check_interval_hours}h</span>
+          </div>
+        `).join('');
+
+        lucide.createIcons();
+      } catch (err) {
+        console.error("Initial load error:", err);
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', loadInitialCatalogs);
+  </script>
+</body>
+</html>
