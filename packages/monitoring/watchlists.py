@@ -54,6 +54,16 @@ class MonitoringEngine:
     def add_alert(self, alert: Alert):
         self.alerts.insert(0, alert)
         logger.info(f"[ALERT-{alert.significance}] {alert.title}: {alert.message}")
+        try:
+            import asyncio
+            from researchos.packages.monitoring.webhooks import alert_dispatcher
+            try:
+                loop = asyncio.get_running_loop()
+                loop.create_task(alert_dispatcher.dispatch(alert))
+            except RuntimeError:
+                pass
+        except Exception as e:
+            logger.debug(f"Webhook dispatch skipped: {e}")
 
     def get_recent_alerts(self, limit: int = 20) -> List[Alert]:
         return self.alerts[:limit]
