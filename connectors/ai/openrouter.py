@@ -13,6 +13,7 @@ from researchos.packages.security.policy import policy_enforcer
 class OpenRouterAIProvider(BaseAIProvider):
     # Known active 100% free model endpoints on OpenRouter
     KNOWN_FREE_MODELS = [
+        "nvidia/nemotron-3-ultra:free",
         "google/gemma-4-26b-a4b-it:free",
         "nvidia/nemotron-nano-12b-v2-vl:free",
         "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
