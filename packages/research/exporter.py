@@ -50,9 +50,11 @@ class ReportExporter:
             md.append(f"## 🔧 Local Queensland Workshops & Specialists\n")
             for b in report.business_results:
                 md.append(f"### {b.name}")
-                md.append(f"- **Location:** {b.suburb_or_city}, {b.state}")
+                loc = f"{b.suburb}, {b.state}" if b.suburb else b.state
+                md.append(f"- **Location:** {loc} ({b.address})")
                 md.append(f"- **Phone:** {b.phone or 'Contact via Web'}")
-                md.append(f"- **Specialization Proof:** {b.specialization_proof}")
+                specs = ", ".join(b.specializations) if b.specializations else "Performance Workshop"
+                md.append(f"- **Specializations:** {specs}")
                 md.append(f"- **Website:** [{b.website or 'Directory Listing'}]({b.website or '#'})\n")
 
         if report.claims:
