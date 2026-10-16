@@ -115,6 +115,8 @@ class VideoCostEngine:
                 )
             )
 
-        # Sort: lowest music video total cost first (Local Wan 2.2 = $0.00 first)
         costs.sort(key=lambda x: x.estimated_total_music_video_cost_aud)
         return costs
+
+
+video_cost_engine = VideoCostEngine()

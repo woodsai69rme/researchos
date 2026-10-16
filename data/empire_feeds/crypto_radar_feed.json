@@ -1,0 +1,16 @@
+{
+  "source": "ResearchOS",
+  "timestamp": "2026-10-16T16:53:24.868334+00:00",
+  "hardware_arbitrage_benchmark": {
+    "asset": "NVIDIA GeForce RTX 4090 24GB",
+    "target_buy_threshold_aud": 1850.0,
+    "median_retail_aud": 2400.0,
+    "currency": "AUD",
+    "location": "Brisbane, Queensland, Australia"
+  },
+  "openrouter_free_status": {
+    "operating_mode": "FREE_ONLY",
+    "verified_spend_aud": 0.0,
+    "active_zero_cost_endpoints": 12
+  }
+}

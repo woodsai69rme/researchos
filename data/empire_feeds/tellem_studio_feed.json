@@ -1,0 +1,59 @@
+{
+  "source": "ResearchOS",
+  "timestamp": "2026-10-16T16:53:24.867790+00:00",
+  "recommended_local_video_engine": "Wan 2.2 Mega (Local ComfyUI)",
+  "local_clip_cost_aud": 0.0,
+  "commercial_cloud_fallbacks": [
+    {
+      "provider": "Wan 2.2 Mega (Local ComfyUI)",
+      "model": "wan2.2-rapid-mega-aio-nsfw-v12.2.safetensors",
+      "resolution": "512x512 / 720p",
+      "estimated_total_mv_cost_aud": 0.0,
+      "free_generations_monthly": 9999
+    },
+    {
+      "provider": "Kling AI (Kuaishou)",
+      "model": "Kling 3.0 Omni",
+      "resolution": "1080p / Native Audio",
+      "estimated_total_mv_cost_aud": 10.58,
+      "free_generations_monthly": 180
+    },
+    {
+      "provider": "Minimax Hailuo AI",
+      "model": "Hailuo 2.3-Fast",
+      "resolution": "720p / 1080p",
+      "estimated_total_mv_cost_aud": 12.09,
+      "free_generations_monthly": 150
+    }
+  ],
+  "recommended_coding_llms": [
+    {
+      "id": "nvidia/nemotron-3-ultra:free",
+      "name": "NVIDIA Nemotron 3 Ultra (550B)",
+      "swe_bench": 78.2,
+      "context": 1048576,
+      "provider": "OpenRouter Free Tier / NVIDIA"
+    },
+    {
+      "id": "ornith-1.0-35b:q4_k_m",
+      "name": "Ornith 1.0 35B (MoE)",
+      "swe_bench": 75.6,
+      "context": 262144,
+      "provider": "Local Ollama / HuggingFace"
+    },
+    {
+      "id": "google/gemma-4-31b-it:free",
+      "name": "Gemma 4 31B Instruct",
+      "swe_bench": 74.8,
+      "context": 131072,
+      "provider": "OpenRouter Free Tier / Google"
+    },
+    {
+      "id": "qwen3-coder:30b",
+      "name": "Qwen 3 Coder 30B",
+      "swe_bench": 74.1,
+      "context": 131072,
+      "provider": "Local Ollama / Alibaba"
+    }
+  ]
+}
