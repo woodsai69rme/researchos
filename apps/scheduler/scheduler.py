@@ -10,6 +10,7 @@ from researchos.packages.monitoring.watchlists import monitoring_engine
 from researchos.packages.monitoring.differ import SnapshotDiffer
 from researchos.packages.research.planner import ResearchPlanner
 from researchos.packages.research.swarm import SearchSwarm
+from researchos.packages.integrations.empire_bridge import empire_bridge
 
 
 class ResearchScheduler:
@@ -63,6 +64,12 @@ class ResearchScheduler:
                 self.cached_snapshots[wl.watchlist_id] = current_snapshot
                 wl.last_checked = now
                 wl.next_check = now + timedelta(hours=wl.check_interval_hours)
+
+        # Continuously sync Empire Bridge intelligence feeds
+        try:
+            empire_bridge.sync_all()
+        except Exception as e:
+            logger.debug(f"[EMPIRE-BRIDGE] Background sync skipped: {e}")
 
     def stop(self):
         self.is_running = False
