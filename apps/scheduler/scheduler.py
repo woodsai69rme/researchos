@@ -3,7 +3,7 @@ ResearchOS 12-Hour / Periodic Background Scheduler Engine
 Runs continuous watchlists, detects price drops, quota shifts, and triggers alerts
 """
 import asyncio
-from datetime import datetime
+from datetime import datetime, timedelta
 from researchos.packages.core.logging import logger
 from researchos.packages.core.config import settings
 from researchos.packages.monitoring.watchlists import monitoring_engine
@@ -62,7 +62,7 @@ class ResearchScheduler:
 
                 self.cached_snapshots[wl.watchlist_id] = current_snapshot
                 wl.last_checked = now
-                wl.next_check = now + asyncio.to_timedelta(hours=wl.check_interval_hours) if hasattr(asyncio, "to_timedelta") else None
+                wl.next_check = now + timedelta(hours=wl.check_interval_hours)
 
     def stop(self):
         self.is_running = False
